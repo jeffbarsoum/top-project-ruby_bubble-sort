@@ -1,12 +1,14 @@
-def test_array
-  [5,4,3,2,1]
-end
+
 
 # Global variables for tracking performance and whether the array is sorted.
 $sort_cnt = 0
 $loop_cnt = 0
 $iteration_cnt = 0
 $is_array_sorted = nil
+
+def test_array
+  [5,4,3,2,1]
+end
 
 def is_sorted? val, next_val, ascending = true
   result = (ascending && val <= next_val) || (!ascending && val >= next_val)
@@ -28,18 +30,20 @@ def swap array, idx_1, idx_2
   return array
 end
 
+def iterate array, k, ascending
+  return if k == array.length - 1
+  val = array[k]
+  next_val = array[k + 1]
+  is_val_sorted = is_sorted? val, next_val, ascending
+  swap array, k, k + 1 unless is_val_sorted
+  $loop_cnt += 1
+end
+
 def bubble_sort array, ascending = true
   i = 0
   j = array.length - i
   until $is_array_sorted || j < 0
-    (0..j).each do |k|
-      break if k == array.length - 1
-      val = array[k]
-      next_val = array[k + 1]
-      is_val_sorted = is_sorted? val, next_val, ascending
-      swap array, k, k + 1 unless is_val_sorted
-      $loop_cnt += 1
-    end
+    (0..j).each { |k| iterate array, k, ascending if k <= array.length - 1 }
     break if $is_array_sorted
     i += 1
     j = array.length - i - 1
