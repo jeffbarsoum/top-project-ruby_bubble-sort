@@ -11,8 +11,10 @@ $is_array_sorted = nil
 ###############################################################################
 ## Helper Functions
 ###############################################################################
-def test_array
-  [5,4,3,2,1]
+# Numbers sort differently than letters / symbols
+def format_val input
+  is_number = (Float(input) rescue false || Integer(input) rescue false)
+  return is_number ? input.to_f : input
 end
 
 # Function to check if the current and next value are sorted
@@ -51,11 +53,81 @@ def iterate array, k, ascending
   $loop_cnt += 1
 end
 
+# A function to pull input from the user
+# Can choose to print spacing, or get input, either or both
+def get_user_input print_spacing = false, get_input = true
+
+  # an indicator to mark the user's input in the console
+  print "--> "
+
+  result = gets.chomp if get_input
+
+  if print_spacing
+      print "\n"
+      print "########################################################################\n\n"
+      print "\n"
+  end
+
+  # Only return the result if we got user input (get_input == true)
+  result if get_input
+end
+
+def return_user_input message, multi_entry = false, user_options = [':q']
+  user_input = nil
+  user_selection = nil
+  dictionary = []
+
+  # print the user message
+  print message
+
+  # ask for input and push it to the dictionary until user option is entered
+  # 'q' is a default, it quits entry
+  #  you can change 'q' to something else, but 'quit' is always the first option
+  until user_options.include? user_selection do
+    user_input = get_user_input
+    user_selection = user_input if user_options.include? user_input
+    dictionary.push format_val user_input unless user_selection
+    break unless multi_entry
+  end
+
+  # just printing some spacing
+  get_user_input true, false
+
+  # create a hash for the return result
+  result = { user_option: user_selection, dictionary: dictionary}
+
+  # return results for processing
+  return result[:dictionary].empty? ? result[:user_option] : result
+end
+
 
 ###############################################################################
 ## Main Function
 ###############################################################################
-def bubble_sort array, ascending = true
+def bubble_sort
+  # Print a nice intro message
+  print "########################################################################\n"
+  print "##############################Bubble Sort###############################\n"
+  print "########################################################################\n\n"
+
+  # get inputs
+  get_array_msg =  <<-STRING
+  -> Enter each value you want to sort."
+     Input 'q' when you have entered all of your values:"
+
+  STRING
+  array = return_user_input(get_array_msg, true)[:dictionary]
+
+  get_sort_order_msg =  <<-STRING
+  -> Do you want to sort in ascending or descending order?
+     Input 'a' or 'd' (or 'q' to quit):
+
+  STRING
+  sort_order = return_user_input get_sort_order_msg, false, [':q','a','d']
+  return puts "See ya!" if sort_order == ':q'
+  ascending = sort_order == 'a'
+
+  # iteration logic for the bubble sort algorithm
   i = 0
   j = array.length - i
   until $is_array_sorted || j < 0
@@ -65,6 +137,8 @@ def bubble_sort array, ascending = true
     j = array.length - i - 1
     $iteration_cnt += 1
   end
+
+  #print results
   print """The bubble sort processed #{$sort_cnt} swaps out of #{$loop_cnt} checks in #{$iteration_cnt} iterations.\n"""
   array
 end
@@ -73,4 +147,4 @@ end
 ###############################################################################
 ## Call Function
 ###############################################################################
-bubble_sort test_array,true
+bubble_sort
