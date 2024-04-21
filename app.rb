@@ -13,13 +13,15 @@ $is_array_sorted = nil
 ###############################################################################
 # Numbers sort differently than letters / symbols
 def format_val input
-  is_number = (Float(input) rescue false || Integer(input) rescue false)
+  is_number = Numeric(input) rescue false
   return is_number ? input.to_f : input
 end
 
 # Function to check if the current and next value are sorted
 def is_sorted? val, next_val, ascending = true
-  result = (ascending && val <= next_val) || (!ascending && val >= next_val)
+  asc_sort = val <= next_val || (val.is_a?(Numeric) && !next_val.is_a?(Numeric))
+  desc_sort = val >= next_val || (!val.is_a?(Numeric) && next_val.is_a?(Numeric))
+  result = (ascending && asc_sort) || (!ascending && desc_sort)
   is_array_sorted? result
   result
 end
